@@ -34,7 +34,7 @@ datasetForDNN*
 testWavs/
 
 # csv files
-datasetFoDNN*
+*.csv
 
 # the npy dumps
 *.npy
