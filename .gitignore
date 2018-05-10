@@ -1,0 +1,40 @@
+# Created by https://www.gitignore.io/api/visualstudiocode
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history
+
+
+# End of https://www.gitignore.io/api/visualstudiocode
+
+# Backups 
+*~
+
+# pycache
+*/__pycache__/
+*.py[cod]
+
+# recorded files
+wavs/
+
+# output graph
+03.png
+
+# dataset
+dataset/
+
+# feature Extracted dataset for dnn
+datasetForDNN*
+
+# testwav files
+testWavs/
+
+# csv files
+datasetFoDNN*
+
+# the npy dumps
+*.npy
