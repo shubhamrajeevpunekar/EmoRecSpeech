@@ -52,7 +52,7 @@ def main():
         countFiles = 0
  
         for wavFile in wavFiles:
-            # print(wavFile)
+            utteranceName = wavFile.split("/")[-1]
             audioRate, audioData = scipy.io.wavfile.read(wavFile)
             frameFeatureMatrix = extractFeatures(audioData, audioRate)
             topSegmentIndices = getTopEnergySegmentsIndices(audioData, audioRate)
@@ -60,7 +60,7 @@ def main():
             # for each top segment in audioData, write the feature vector into csv_dataset along with target emotionLabelNum
             for topSegmentIndex in range(len(topSegmentFeatureMatrix)):
                 featureVector = ",".join(['%.8f' % num for num in topSegmentFeatureMatrix[topSegmentIndex]])
-                featureVector = featureVector + "," + str(emotionLabelNum) + "\n"
+                featureVector = utteranceName + "," + featureVector + "," + str(emotionLabelNum) + "\n"
                 csv_dataset.write(featureVector)
                 countSegmentsPerEmotion += 1
 

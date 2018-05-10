@@ -12,22 +12,18 @@ from sklearn.metrics import classification_report, confusion_matrix
 def main():
 
     # Get data into X and y
-    df = pd.read_csv("datasetForDNN.csv")
+    df = pd.read_csv("datasetForDNN.csv", header=None)
     print("Dataset loaded into dataframe...")
 
     # Split into X and y
-    X = df.iloc[:, :-1].values
-    y = df.iloc[:, -1].values
+    utteranceNames = df.iloc[:,0] # get utteranceNames
+    X = df.iloc[:, 1:-1].values # remove the utteranceName and target emotionLabelNum
+    y = df.iloc[:, -1].values # get target emotionLabelNum
     print("X and y loaded....")
     
     # Split into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
     print("Training and testing sets created...")
-
-    # save X_train, will be needed for normalizing test data
-    np.save("X_train.npy", X_train)
-    print("Saved X_train needed for normalization...")
-
 
     # Normalize data
     scaler = StandardScaler()
@@ -36,6 +32,12 @@ def main():
     X_test =scaler.transform(X_test)
     print("X_train and X_test normalized...")
 
+    # Save scaler parameters for normalizing test data
+    scalerParametersDump = "scalerParameters.sav" 
+    # scalerParametersDump = "scalerParameters_test.sav"
+    joblib.dump(scaler, scalerParametersDump)
+
+    
     dnn = MLPClassifier(hidden_layer_sizes=(100,100), activation='relu',
                         solver='adam', max_iter=100, verbose=True,
                         early_stopping=True, validation_fraction=0.1)
@@ -50,6 +52,7 @@ def main():
     
     # Make the model persistent
     dnnParametersDump = "dnnParameters.sav" # TODO add a dummy line here, for demo
+    # dnnParametersDump = "dnnParameters_test.sav"
     joblib.dump(dnn, dnnParametersDump)
     # for loading -> dnn = joblib.load("dnnParameters.sav")
 
@@ -63,7 +66,7 @@ def main():
     print(confusion_matrix(y_test, predictions))
     print("CLASSIFICATION REPORT for testing data :")
     print(classification_report(y_test, predictions))
-
+   
 
 if __name__ == '__main__':
     main()
