@@ -4,3 +4,5 @@
 - dependencies for python_speech_features : 
     - mkl-random 1.0.1 and mkl-fft require cython
     - pip install cython
+- pip install elm
+- pip install sklearn-extensions

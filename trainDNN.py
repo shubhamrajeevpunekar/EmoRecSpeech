@@ -10,9 +10,10 @@ from sklearn.externals import joblib
 from sklearn.metrics import classification_report, confusion_matrix
 
 def main():
+    DIR = os.path.dirname(os.path.realpath(__file__))
 
     # Get data into X and y
-    df = pd.read_csv("datasetForDNN.csv", header=None)
+    df = pd.read_csv(DIR + "/datasetForDNN.csv", header=None)
     print("Dataset loaded into dataframe...")
 
     # Split into X and y
@@ -29,16 +30,16 @@ def main():
     scaler = StandardScaler()
     scaler.fit(X_train)
     X_train = scaler.transform(X_train)
-    X_test =scaler.transform(X_test)
+    X_test = scaler.transform(X_test)
     print("X_train and X_test normalized...")
 
     # Save scaler parameters for normalizing test data
-    scalerParametersDump = "scalerParameters.sav" 
+    scalerParametersDump = DIR  + "/scalerParameters.sav" 
     # scalerParametersDump = "scalerParameters_test.sav"
     joblib.dump(scaler, scalerParametersDump)
 
     
-    dnn = MLPClassifier(hidden_layer_sizes=(100,100), activation='relu',
+    dnn = MLPClassifier(hidden_layer_sizes=(500), activation='relu',
                         solver='adam', max_iter=100, verbose=True,
                         early_stopping=True, validation_fraction=0.1)
 
@@ -51,7 +52,7 @@ def main():
     print("DNN trained in " + str(tEnd-tStart) + " seconds ...")
     
     # Make the model persistent
-    dnnParametersDump = "dnnParameters.sav" # TODO add a dummy line here, for demo
+    dnnParametersDump = DIR + "/dnnParameters.sav" # TODO add a dummy line here, for demo
     # dnnParametersDump = "dnnParameters_test.sav"
     joblib.dump(dnn, dnnParametersDump)
     # for loading -> dnn = joblib.load("dnnParameters.sav")

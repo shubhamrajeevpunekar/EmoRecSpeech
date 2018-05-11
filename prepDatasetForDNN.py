@@ -12,12 +12,12 @@ def main():
     AUDIO_DATASET = os.path.dirname(os.path.realpath(__file__)) + "/dataset/"
     
     # path to feature extracted dataset for DNN
-    # CSV_DATASET = os.path.dirname(os.path.realpath(__file__)) + "/datasetForDNN.csv"
-    CSV_DATASET = os.path.dirname(os.path.realpath(__file__)) + "/datasetForDNN_test.csv"
+    CSV_DATASET = os.path.dirname(os.path.realpath(__file__)) + "/datasetForDNN.csv"
+    # CSV_DATASET = os.path.dirname(os.path.realpath(__file__)) + "/datasetForDNN_test.csv"
 
     # maintain a dictionary for emotion label and labelNumber
     emotions = {}
-    emotionLabelNum = -1 # this will be needed to set the target in csv file
+    emotionLabelNum = 0 # this will be needed to set the target in csv file
 
     emotionDirPaths = glob.glob(AUDIO_DATASET + "*")
 
@@ -31,8 +31,7 @@ def main():
         emotionLabel = emotionDirPath.split("/")[-1] 
 
         # set the emotion label
-        emotions[emotionLabel] = emotionLabelNum
-        emotionLabelNum += 1
+        emotions[emotionLabel] = emotionLabelNum        
 
         # for all files in the emotionLabel directory, generate csv data
         print("Generating csv data for : " + emotionLabel)
@@ -73,6 +72,8 @@ def main():
         sys.stdout.write("\n")
         # print the count for each emotion
         print("Number of segments for emotion : " + emotionLabel + " [ " + str(emotionLabelNum) + " ] : " + str(countSegmentsPerEmotion))
+
+        emotionLabelNum += 1
     csv_dataset.close()
 
 if __name__ == '__main__':

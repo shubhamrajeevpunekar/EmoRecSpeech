@@ -10,13 +10,15 @@ import matplotlib.pyplot as plt
 import seaborn
 
 def main():
+    DIR = os.path.dirname(os.path.realpath(__file__))
     # load dnn params
-    dnn = joblib.load(os.path.dirname(os.path.realpath(__file__)) + "/dnnParameters_2.sav")
+    dnn = joblib.load(DIR  + "/dnnParameters.sav")
     print("DNN loaded...")
 
     #  load test file
-    testFile = "keaton.wav"
-    testFilePath = os.path.dirname(os.path.realpath(__file__)) + "/testWavs/" + testFile
+    testFile = sys.argv[1]
+    # testFile = "keaton.wav"
+    testFilePath = DIR + "/testWavs/" + testFile
     audioRate, audioData = wavfile.read(testFilePath)
     frameFeatureMatrix = extractFeatures(audioData, audioRate)
     topSegmentIndices = getTopEnergySegmentsIndices(audioData, audioRate)
@@ -24,9 +26,8 @@ def main():
     print("Segments generated...")
 
     # normalize the data
-    X_train = np.load("X_train.npy")
-    scaler = StandardScaler()
-    scaler.fit(X_train)
+    scaler = joblib.load(DIR + "/scalerParameters.sav")
+    topSegmentFeatureMatrix = scaler.transform(topSegmentFeatureMatrix)
     print("Data normalized...")
 
     # for each segement generate the probability distribution
@@ -35,7 +36,7 @@ def main():
     # convert to percent
     segmentProbabilities = segmentProbabilities * 100
 
-    print(segmentProbabilities)
+    print(str(segmentProbabilities) + ", samples : " + str(len(segmentProbabilities)))
 
     # plot probability distribution
     prob0 = segmentProbabilities[:,0]
