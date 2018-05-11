@@ -1,10 +1,11 @@
 import glob
 import os
+import wave
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pyaudio
-import wave
 from sklearn.externals import joblib
 
 from energy import getTopEnergySegmentsIndices
@@ -35,36 +36,62 @@ def main():
     outWav.setsampwidth(2)
     outWav.setframerate(RATE)
 
-    utterance = b'' # empty byte string
-    for _ in range(int(RATE*UTTERANCE_SECONDS/CHUNK)):
-        samples = testWav.readframes(CHUNK)
-        utterance += samples
-    outWav.writeframes(utterance)
-    outWav.close()
+    utteranceProbabilities = []
+    # aggregate 5 seconds of frames, process each 5 second utterance
+    utteranceCount = 0
+    while(True):
+        try:
+            utterance = b'' # empty byte string
+            for _ in range(int(RATE*UTTERANCE_SECONDS/CHUNK)):
+                samples = testWav.readframes(CHUNK)
+                utterance += samples
+            
+            # outWav.writeframes(utterance)
 
-    utterance = np.fromstring(utterance, np.int16)
-    frameFeatureMatrix = extractFeatures(utterance, RATE)
-    topSegmentIndices = getTopEnergySegmentsIndices(utterance, RATE)
-    topSegmentFeatureMatrix = getSegmentFeaturesUsingIndices(frameFeatureMatrix, 25, topSegmentIndices)
+            utterance = np.fromstring(utterance, np.int16)
+            frameFeatureMatrix = extractFeatures(utterance, RATE)
+            topSegmentIndices = getTopEnergySegmentsIndices(utterance, RATE)
+            topSegmentFeatureMatrix = getSegmentFeaturesUsingIndices(frameFeatureMatrix, 25, topSegmentIndices)
 
-    # normalize data
-    scaler = joblib.load(DIR + "/scalerParameters.sav")
-    topSegmentFeatureMatrix = scaler.transform(topSegmentFeatureMatrix)
+            # normalize data
+            scaler = joblib.load(DIR + "/scalerParameters.sav")
+            topSegmentFeatureMatrix = scaler.transform(topSegmentFeatureMatrix)
 
-    # generate probabilities with DNN
-    dnn = joblib.load(DIR  + "/dnnParameters.sav")
-    segmentProbabilities = dnn.predict_proba(topSegmentFeatureMatrix)
+            # generate probabilities with DNN
+            dnn = joblib.load(DIR  + "/dnnParameters.sav")
+            segmentProbabilities = dnn.predict_proba(topSegmentFeatureMatrix)
 
-    # create high level features
-    avgSegmentProbabilities = np.mean(segmentProbabilities, axis=0)
+            # create high level features
+            avgSegmentProbabilities = np.mean(segmentProbabilities, axis=0)
+            
+            # determine emotionLabelNum
+            emotionLabelNum = np.argmax(avgSegmentProbabilities)
+
+            # display result
+            print("Probabilities : " + str(avgSegmentProbabilities))
+            utteranceProbabilities.append(avgSegmentProbabilities) # save for plotting
+            print(WAV_FILE + " : " + str(utteranceCount) + " ---> " + emotions[emotionLabelNum])
+
+            # update the utterance count, for the next CHUNKs read from the file
+            utteranceCount += 1
+        except :
+            break
+        
+    utteranceProbabilities = np.array(utteranceProbabilities)    
+    prob0 = utteranceProbabilities[:,0]
+    prob1 = utteranceProbabilities[:,1]
+    prob2 = utteranceProbabilities[:,2]
+    prob3 = utteranceProbabilities[:,3]    
+    # plot the data
+    plt.xlabel("Seconds")  
+    plt.ylabel("Confidence")  
+    plt.plot(np.arange(1,(len(prob0))*UTTERANCE_SECONDS, UTTERANCE_SECONDS), prob0, label="neu", color="red")
+    plt.plot(np.arange(1,(len(prob0))*UTTERANCE_SECONDS, UTTERANCE_SECONDS), prob1, label="sad_fea", color="blue")
+    plt.plot(np.arange(1,(len(prob0))*UTTERANCE_SECONDS, UTTERANCE_SECONDS), prob2, label="ang_fru", color="green")
+    plt.plot(np.arange(1,(len(prob0))*UTTERANCE_SECONDS, UTTERANCE_SECONDS), prob3, label="hap_exc_sur", color="black")
+    plt.legend(loc="upper left")
+    plt.show()
     
-    # determine emotionLabelNum
-    emotionLabelNum = np.argmax(avgSegmentProbabilities)
-
-    # display result
-    print("Probabilities : " + str(avgSegmentProbabilities))
-    print(WAV_FILE + " ---> " + emotions[emotionLabelNum])
-
 
 if __name__ == '__main__':
     main()
