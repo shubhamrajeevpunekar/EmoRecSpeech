@@ -64,15 +64,15 @@ def main():
                 samples = testWav.readframes(CHUNK)
                 utterance += samples
             
-            # for testing, see if each 5 second utterance matches the deteced emotion
-            WAV_OUT = os.path.join(MP4_DIR,FILE+ "_" +str(utteranceCount)+".wav")
-            outWav = wave.open(WAV_OUT, "w")
-            outWav.setnchannels(1)
-            outWav.setsampwidth(2)
-            outWav.setframerate(RATE)
-            outWav.writeframes(utterance)
-            outWav.close()
-            print("Saved : " + str(WAV_OUT))
+            # # for testing, see if each 5 second utterance matches the deteced emotion
+            # WAV_OUT = os.path.join(MP4_DIR,FILE+ "_" +str(utteranceCount)+".wav")
+            # outWav = wave.open(WAV_OUT, "w")
+            # outWav.setnchannels(1)
+            # outWav.setsampwidth(2)
+            # outWav.setframerate(RATE)
+            # outWav.writeframes(utterance)
+            # outWav.close()
+            # print("Saved : " + str(WAV_OUT))
             
             utterance = np.fromstring(utterance, np.int16)
             frameFeatureMatrix = extractFeatures(utterance, RATE)
@@ -104,7 +104,10 @@ def main():
             utteranceCount += 1
         except :
             break
-        
+
+    # remove wav file
+    os.remove(os.path.join(MP4_DIR, FILE+".wav"))
+
     utteranceProbabilities = np.array(utteranceProbabilities)    
     prob0 = utteranceProbabilities[:,0]
     prob1 = utteranceProbabilities[:,1]

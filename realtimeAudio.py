@@ -1,5 +1,6 @@
 import glob
 import os
+import sys
 import wave
 
 import matplotlib.pyplot as plt
@@ -24,9 +25,14 @@ def main():
     DEVICE_OP_HW = "pulse"
     UTTERANCE_SECONDS = 5
 
-    # load wav
+    # load wavn
+        # load FILE
+    try:
+        FILE = sys.argv[1]
+    except :
+        FILE="keaton"
     WAVS_DIR = os.path.join(DIR, "testWavs")
-    WAV_FILE = os.path.join(WAVS_DIR, "keaton.wav")
+    WAV_FILE = os.path.join(WAVS_DIR, FILE+".wav")
     testWav = wave.open(WAV_FILE,"r")
 
     
