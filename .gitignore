@@ -38,3 +38,7 @@ testWavs/
 
 # the npy dumps
 *.npy
+
+# ignore any testing wavs created
+*.wav
+*/*.wav
