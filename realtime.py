@@ -36,8 +36,12 @@ def main():
     outWav.setsampwidth(2)
     outWav.setframerate(RATE)
 
-    utteranceProbabilities = []
     # aggregate 5 seconds of frames, process each 5 second utterance
+    # NOTE : it is possible to directly read frames for 5 seconds 
+    # i.e. (RATE*UTTERANCE_SECONDS), instead of reading them CHUNK by CHUNK 
+    # and aggregating them, but we are using a for loop on CHUNKS, to 
+    # keep it consistent with pyaudio stream input, which will be added later
+    utteranceProbabilities = []
     utteranceCount = 0
     while(True):
         try:
