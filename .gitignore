@@ -42,3 +42,6 @@ testWavs/
 # ignore any testing wavs created
 *.wav
 */*.wav
+
+# ignore testMp4s
+testMp4s/
