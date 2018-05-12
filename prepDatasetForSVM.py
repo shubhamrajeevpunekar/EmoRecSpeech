@@ -25,7 +25,21 @@ def main():
     # get the dataset ready
     df = pd.read_csv(DIR + "/datasetForDNN.csv", header=None)
     print("Dataset loaded into dataframe...")
-    
+
+    # handle dataset
+    # get dataframes of all emotions individually
+    df0 = df.loc[df[326] == 0]
+    df1 = df.loc[df[326] == 1]
+    df2 = df.loc[df[326] == 2]
+    df3 = df.loc[df[326] == 3]
+   
+    MIN_SAMPLES = np.min([df0.shape[0], df1.shape[0], df2.shape[0], df3.shape[0]])
+    df0 = df0.iloc[0:MIN_SAMPLES,:]
+    df1 = df1.iloc[0:MIN_SAMPLES,:]
+    df2 = df2.iloc[0:MIN_SAMPLES,:]
+    df3 = df3.iloc[0:MIN_SAMPLES,:]
+
+    df = pd.concat([df0, df1, df2, df3])   
  
     # Split into X and y
     utteranceNames = df.iloc[:,0] # get utteranceNames
